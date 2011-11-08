@@ -21,7 +21,9 @@ public class DecodeLinks {
 	
 	private static String[] result;
 
-	public static void analyze(Video video,Map<String, File> hostPluginsList){
+	public static void analyze(Video video, Map<String,File> hostPluginsList){
+		
+		System.out.println("test: "+video.getAddress());
 			
 		getVideoHost(video);
 		
@@ -182,7 +184,7 @@ public class DecodeLinks {
 	
 	private static void getVideoHost(Video video){
 		
-		Pattern pat = Pattern.compile("http://(?:www.|)([xhamster|youtube|tube8|videobb]*).");
+		Pattern pat = Pattern.compile("http(?:s|)://(?:www.|)([xhamster|youtube|tube8|videobb]*).");
 		Matcher match = pat.matcher(video.getAddress());
 		
 		if (match.find())

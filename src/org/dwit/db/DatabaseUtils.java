@@ -10,7 +10,7 @@ public class DatabaseUtils {
 	 
 	private Connection connection;
 	private String jdbcDriver = "org.hsqldb.jdbcDriver";
-	private String database_name = "...";
+	private String database_name = "db";
 	private String database = "jdbc:hsqldb:file:"+database_name;
 	private String user = "sa";
 	private String password = "";

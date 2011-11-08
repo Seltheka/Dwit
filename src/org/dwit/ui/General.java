@@ -36,7 +36,6 @@ package org.dwit.ui;
  *
  */
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 import org.dwit.main.DownloadManager;
 import org.dwit.model.Video;
@@ -44,22 +43,22 @@ import org.dwit.model.Videos;
 import org.dwit.ui.DownloadTable;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Shape;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class General implements ActionListener,MouseListener{
@@ -74,11 +73,19 @@ public class General implements ActionListener,MouseListener{
     
     private Map threadList = Collections.synchronizedMap(new HashMap());
     
-    private Videos videosModel = new Videos();
+    //private Videos videosModel;// = new Videos();
     
-    private Videos videos = new Videos();
+    private Videos videos;// = new Videos();
     
     private Preferences preferences;
+    
+    private Help help;
+    
+    private Credits credits;
+    
+	private final static Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+	
+	private ResourceBundle lM;
     
     public void addComponentsToPane(Container pane) {
         
@@ -92,7 +99,7 @@ public class General implements ActionListener,MouseListener{
                     java.awt.ComponentOrientation.RIGHT_TO_LEFT);
         }       
         
-        pane.add(createDownloadInfo(), BorderLayout.PAGE_START);
+        //pane.add(createDownloadInfo(), BorderLayout.PAGE_START);
         
         JDialog dialog = new Dialog(frame,"Downloader",this);
         dialog.pack();
@@ -107,11 +114,9 @@ public class General implements ActionListener,MouseListener{
         
         JPanel pageEnd = new JPanel();
         
-        JTextField nbrDL = new JTextField("4",3);
+        //nbrDL.setHorizontalAlignment(JTextField.RIGHT);
         
-        nbrDL.setHorizontalAlignment(JTextField.RIGHT);
-        
-        pageEnd.add(nbrDL);
+        pageEnd.add(new JLabel("This is a development version"));
         
         pane.add(pageEnd, BorderLayout.PAGE_END);
         
@@ -132,11 +137,13 @@ public class General implements ActionListener,MouseListener{
     	
     	 // Create the menu bar
         JMenuBar menuBar = new JMenuBar();
+        
+        // General Menu
 
-        JMenu menu = new JMenu("Fichier");
+        JMenu menu = new JMenu(lM.getString("file"));
         menuBar.add(menu);
         
-        JMenuItem item = new JMenuItem("Ajouter liens");
+        JMenuItem item = new JMenuItem(lM.getString("add_links"));
         
         item.setMnemonic(KeyEvent.VK_N);
         item.setAccelerator(KeyStroke.getKeyStroke(
@@ -149,8 +156,29 @@ public class General implements ActionListener,MouseListener{
         });
         
         menu.add(item);
+        
+        item = new JMenuItem(lM.getString("add_links_clipboard"));
+        
+        item.setMnemonic(KeyEvent.VK_V);
+        item.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_V, ActionEvent.ALT_MASK));
+        item.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae){
+            	try {
+					processLinks((String)clipboard.getContents(null).getTransferData(DataFlavor.stringFlavor));
+				} catch (UnsupportedFlavorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
+        
+        menu.add(item);
 
-        item = new JMenuItem("Quitter");
+        item = new JMenuItem(lM.getString("quit"));
         
         item.setMnemonic(KeyEvent.VK_Q);
         item.setAccelerator(KeyStroke.getKeyStroke(
@@ -163,10 +191,40 @@ public class General implements ActionListener,MouseListener{
         
         menu.add(item);
         
-        menu = new JMenu("Préférences");
+        // Selection Menu
+        
+        menu = new JMenu(lM.getString("select"));
         menuBar.add(menu);
         
-        item = new JMenuItem("Générales");
+        item = new JMenuItem(lM.getString("select_pause"));
+        
+        menu.add(item);
+        
+        item = new JMenuItem(lM.getString("select_remove"));
+        
+        menu.add(item);
+        
+        item = new JMenuItem(lM.getString("select_open"));
+        
+        item.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae){
+            	try {
+					Runtime.getRuntime().exec("open .");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
+        
+        menu.add(item);
+        
+        // Preferences Menu
+        
+        menu = new JMenu(lM.getString("preferences"));
+        menuBar.add(menu);
+        
+        item = new JMenuItem(lM.getString("general"));
         
         item.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ae){
@@ -176,19 +234,35 @@ public class General implements ActionListener,MouseListener{
         
         menu.add(item);
         
-        item = new JMenuItem("Plugins");
+        item = new JMenuItem(lM.getString("plugins"));
         menu.add(item);
         
-        item = new JMenuItem("Avancé");
+        item = new JMenuItem(lM.getString("advanced"));
         menu.add(item);
         
-        menu = new JMenu("Aide");
+        // Help Menu
+        
+        menu = new JMenu(lM.getString("help"));
         menuBar.add(menu);
         
-        item = new JMenuItem("Aide Générale");
+        item = new JMenuItem(lM.getString("help_general"));
+        
+        item.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae){
+            	help.setVisible(true);
+            }
+        });
+        
         menu.add(item);
         
-        item = new JMenuItem("Crédits");
+        item = new JMenuItem(lM.getString("help_credits"));
+        
+        item.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae){
+            	credits.setVisible(true);
+            }
+        });
+        
         menu.add(item);
 
         // Install the menu bar in the frame
@@ -232,7 +306,13 @@ public class General implements ActionListener,MouseListener{
 
     public General(Map threadList) {
         
-    	this.threadList = threadList;
+    	synchronized(threadList){
+	    	this.threadList = threadList;
+	    	this.lM = (ResourceBundle) threadList.get("languagesManager");
+    	}
+    	
+    	videos = new Videos(threadList);
+    	//videosModel = new Videos(threadList);
     	
         //Create and set up the window.
     	frame = new JFrame("BorderLayoutDemo");
@@ -243,12 +323,13 @@ public class General implements ActionListener,MouseListener{
         addComponentsToPane(frame.getContentPane());
         
         preferences = new Preferences(threadList);
-        
+        help = new Help(threadList);
+        credits = new Credits(threadList);
         
         //Use the content pane's default BorderLayout. No need for
         //setLayout(new BorderLayout());
         //Display the window.
-        frame.setTitle("Dwit 0.0.5");
+        frame.setTitle("Dwit 0.0.5 (dev)");
         frame.setVisible(true);
         frame.setResizable(true);
         

@@ -23,12 +23,12 @@ public class DownloadTable extends JPanel{
 		/* Setting layout */
 		GridBagLayout layout = new GridBagLayout();
 		this.setLayout(layout);
-		GridBagConstraints layoutConstraints = new GridBagConstraints();		
+		GridBagConstraints layoutConstraints = new GridBagConstraints();
 		
-		model.addVideo(new Video("http://patate.com"));
+		//model.addVideo(new Video("http://patate.com"));
 		
 		table = new JTable(model);
-		
+
 		TableColumn col = table.getColumnModel().getColumn(3);
 		col.setCellRenderer(new DownloadTableRenderer());
 		

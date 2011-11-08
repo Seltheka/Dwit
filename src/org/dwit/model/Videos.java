@@ -8,6 +8,8 @@ import org.dwit.model.*;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -15,10 +17,24 @@ public class Videos extends AbstractTableModel {
 	
 	private ArrayList<Video> videos = new ArrayList<Video>();
 	
-	private final String[] header = new String[]{"Name","Host","Status","Progress"};
+	private ResourceBundle lM;
+	
+	private final String[] header = new String[]{"file_name","file_host","file_status","file_progress"};
+	
+	public Videos(Map threadList){
+		
+		synchronized(threadList){
+			lM = (ResourceBundle) threadList.get("languagesManager");
+		}
+		
+		for (int i=0;i<header.length;i++){
+			header[i] = lM.getString(header[i]);			
+		}
+		
+	}
 	
 	public Videos(){
-				
+		
 	}
 
 	@Override
@@ -37,8 +53,10 @@ public class Videos extends AbstractTableModel {
 	public Object getValueAt(int arg0, int arg1) {
 		// TODO Auto-generated method stub
 		
-		Video video = ((Video)videos.get(arg0));
+		// TODO problem here when adding video with unknown host
 		
+		Video video = ((Video)videos.get(arg0));
+				
 		switch (arg1) {
     	
 			case 0:	return video.getVideoName();
@@ -53,7 +71,9 @@ public class Videos extends AbstractTableModel {
 	}
 	
 	public String getColumnName(int index){
+		
 		return header[index];
+		
 	}
 	
 	
@@ -76,6 +96,7 @@ public class Videos extends AbstractTableModel {
 		videos.add(video);
 		
 		this.fireTableRowsInserted(getRowCount(), getRowCount());
+		
 	}
 	
 	public int getIndexOf(Video video){

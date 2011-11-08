@@ -22,6 +22,8 @@ public class DownloadPages {
 				
 		url = new URL(video.getAddress());
 		
+		System.out.println(video.getAddress());
+				
 		HttpURLConnection uc = (HttpURLConnection) url.openConnection();
 		
 		uc.setRequestProperty("User-agent", "Mozilla/5.0");
@@ -36,7 +38,7 @@ public class DownloadPages {
 
 		while ((decodedString = in.readLine()) != null) {
 			end += decodedString;
-			System.out.println(decodedString);
+			//System.out.println(decodedString);
 		}
 		
 		in.close();

@@ -30,28 +30,6 @@ public class DownloadVideo extends Thread {
 		
 		updateLocalVideo();
 	}
-
-	public static void fetch0(Video video) throws MalformedURLException, IOException{
-		 
-		BufferedInputStream in = new BufferedInputStream(
-				new URL("http://xhamster.com/flv2/"+video.getVideoAddress()).openStream()
-				);
-		
-		FileOutputStream fos = new FileOutputStream(video.getVideoName());
-		BufferedOutputStream bout = new BufferedOutputStream(fos,1024);
-		
-		byte[] data = new byte[1024];
-		
-		int x=0;
-		
-		while((x=in.read(data,0,1024))>=0){
-			bout.write(data,0,x);
-		}
-		
-		bout.close();
-		in.close();
-		
-	}
 	
 	public void run(){
 		
@@ -81,8 +59,15 @@ public class DownloadVideo extends Thread {
             System.out.println(fileLength);
 
             input = connection.getInputStream();
-            //String fileName = url.getFile().substring(url.getFile().lastIndexOf('/') + 1);
-            String fileName = video.getVideoName().replace(" ", "_")+".flv";
+            
+            // Manipulating file extension
+            
+            String extension = connection.getContentType().split("/")[1];
+            
+            if (extension.contains("-"))
+            	extension = extension.substring(extension.lastIndexOf("-")+1);
+            
+            String fileName = video.getVideoName().replace(" ", "_")+"."+extension;
             writeFile = new FileOutputStream(fileName);
                         
             byte[] buffer = new byte[1024];

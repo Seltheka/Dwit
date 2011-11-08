@@ -22,7 +22,7 @@ public class DownloadTableRenderer extends JProgressBar implements TableCellRend
 			setValue(Integer.parseInt(value.toString()));
 		
 		if (isSelected){
-
+			//new JPopupMenu();
 		} else {
 
 		}

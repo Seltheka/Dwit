@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Logger;
 
 import org.dwit.model.Video;
 import org.dwit.model.Videos;
@@ -26,7 +27,19 @@ public class DownloadManager extends Thread {
 		
 	private Map<String, File> hostPluginsList = Collections.synchronizedMap(new HashMap());
 	
-	public DownloadManager(){		
+	private static Map threadList = Collections.synchronizedMap(new HashMap());
+	
+	private static Logger logger;
+	
+	public DownloadManager(Map threadList){		
+		
+		this.threadList = threadList;
+		
+		synchronized(threadList){
+			
+			logger = (Logger)threadList.get("logger");
+			
+		}
 		
 		synchronized(hostPluginsList){
 		
@@ -43,7 +56,7 @@ public class DownloadManager extends Thread {
 	}
 	
 	public synchronized void run(){
-		
+				
 		while(true){
 					
 			while(!queue.isEmpty()){
@@ -56,17 +69,18 @@ public class DownloadManager extends Thread {
 					video = (Video)videos.getVideo(index);
 				}
 				
+				System.out.println("video:"+video.getVideoHost());
+				
 				try{
 					DecodeLinks.analyze(video,hostPluginsList);
 				} catch (Exception e){
-					System.err.println("Erreur fetching");
+					logger.throwing("Error fetching", null, e);
 					break;
 				}
 				
 				if (video.getVideoAddress()==null){
 					
 					videos.removeVideoAt(index);
-					System.err.println("No video address");
 					break;
 					
 				}

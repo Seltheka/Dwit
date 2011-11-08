@@ -28,9 +28,9 @@ public class DefaultClassLoader extends ClassLoader {
 		if (cls!=null)
 			return cls;
 				
-		System.out.println(test++);
+		//System.out.println(test++);
 		
-		System.out.println(classFile);
+		//System.out.println(classFile);
 		
 		/*classFile = new String("plugins/hosts/SamplePlugin.class");
 		
